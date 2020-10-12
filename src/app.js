@@ -8,6 +8,26 @@ class IndecisionApp extends React.Component {
         this.state = {options: []}
     }
 
+    componentDidMount() {
+        try {
+            const json = localStorage.getItem('options');
+            const options = JSON.parse(json);
+
+            if (options) {
+                this.setState(() => ({options}))
+            }
+        } catch(e) {
+            //Default
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.options.length !== this.state.options.length) {
+            const json = JSON.stringify(this.state.options);
+            localStorage.setItem('options', json);
+        }
+    }
+
     handleClearList() {
         this.setState(() => ({ options: [] }))
     }
@@ -88,7 +108,9 @@ class Options extends React.Component {
     render() {
         return (
             <div>
-                <button onClick={this.props.handleClearList}>Clear List</button>
+                <button
+                    onClick={this.props.handleClearList}>Clear List</button>
+                {this.props.options.length === 0 && <p>Let me help you decide.</p>}
                 {
                     this.props.options.map((option) => (
                         <Option
@@ -131,7 +153,11 @@ class AddOptions extends React.Component {
         const option = e.target.elements.option.value.trim();
         const error = this.props.handleAddOption(option);
 
-        this.setState(() => ({error}));
+        this.setState(() => ({ error }));
+        
+        if (!error) {
+            e.target.elements.options.value = '';
+        }
     }
     render() {
         return (

@@ -25,6 +25,30 @@ var IndecisionApp = function (_React$Component) {
     }
 
     _createClass(IndecisionApp, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            try {
+                var json = localStorage.getItem('options');
+                var options = JSON.parse(json);
+
+                if (options) {
+                    this.setState(function () {
+                        return { options: options };
+                    });
+                }
+            } catch (e) {
+                //Default
+            }
+        }
+    }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate(prevProps, prevState) {
+            if (prevState.options.length !== this.state.options.length) {
+                var json = JSON.stringify(this.state.options);
+                localStorage.setItem('options', json);
+            }
+        }
+    }, {
         key: 'handleClearList',
         value: function handleClearList() {
             this.setState(function () {
@@ -142,8 +166,14 @@ var Options = function (_React$Component2) {
                 null,
                 React.createElement(
                     'button',
-                    { onClick: this.props.handleClearList },
+                    {
+                        onClick: this.props.handleClearList },
                     'Clear List'
+                ),
+                this.props.options.length === 0 && React.createElement(
+                    'p',
+                    null,
+                    'Let me help you decide.'
                 ),
                 this.props.options.map(function (option) {
                     return React.createElement(Option, {
@@ -200,6 +230,10 @@ var AddOptions = function (_React$Component3) {
             this.setState(function () {
                 return { error: error };
             });
+
+            if (!error) {
+                e.target.elements.options.value = '';
+            }
         }
     }, {
         key: 'render',
